@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+    <title>search google trends mid</title>
+</head>
+<body>
+    <style>
+        td {
+            padding: 10px;
+        }
+        thead {
+            font-weight: bolder;
+        }
+        tbody>tr:hover {
+            background-color: lightgray;
+        }
+    </style>
+    <form>
+        <input type="text" name="keyword" value="{{keyword}}"> <input type="submit" value="search">
+        <input type="hidden" name="target_id" value="{{target_id}}">
+    </form>
+    <table cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <td>title</td>
+                <td>type</td>
+                <td>mid</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr onclick="select_mid('{{result.mid}}')">
+                <td>{{result.title}}</td>
+                <td>{{result.type}}</td>
+                <td>{{result.mid}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        function  select_mid(mid) {
+            window.opener.document.getElementById('{{target_id}}').value = mid;
+            window.close()
+        }
+    </script>
+</body>
+</html>

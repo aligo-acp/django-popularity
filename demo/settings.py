@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_popularity',
+    'django_action_reservation',
     'demo.demo_app',
 ]
 

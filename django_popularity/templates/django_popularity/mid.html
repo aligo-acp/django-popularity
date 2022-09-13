@@ -1,0 +1,12 @@
+{% load i18n admin_urls %}
+{% include 'django/forms/widgets/input.html' %}
+<input type="button" value="search" onclick="openSearchPopup(this);"/>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    function openSearchPopup(btn_ele) {
+        var mid_ele = btn_ele.previousElementSibling;
+        var url = "{% url 'popularity:search_mid_popup' %}" + `?target_id=${mid_ele.id}`;
+        window.open(url, 'a', 'width=800, height=800');
+    }
+</script>
