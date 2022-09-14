@@ -1,7 +1,6 @@
-from datetime import timedelta
-
-from django.db.models import (Avg, CharField, IntegerField, Manager, OuterRef,
-                              Q, QuerySet, Subquery, Value)
+from django.db.models import (CharField, IntegerField, Manager, OuterRef,
+                              Subquery, Value)
+from django.utils.module_loading import import_string
 from django.utils.timezone import now
 
 from django_popularity.conf import settings
@@ -33,22 +32,12 @@ def objects_with_mid_info(cls):
               .annotate(title=Subquery(sugs.values('title')))
 
 
-class PopularityQuerySet(QuerySet):
-    def reserve_update(self):
-        self.model.reserve
-        for obj in self:
-            obj.reserve_update()
-
-
-class PopularityManager(Manager.from_queryset(PopularityQuerySet)):
+class PopularityManager(Manager):
     def get_queryset(self, base_days=settings.POPULARITY_DEFAULT_BASE_DAYS):
-        score = Avg(
-            'graph__date_points__value',
-            filter=Q(graph__date_points__date__gte=now() - timedelta(days=base_days))
-        )
         qs = super().get_queryset()
-        return  qs\
-                    .annotate(base_days=Value(base_days, IntegerField())) \
-                    .annotate(score=score)
+        qs = qs.annotate(base_days=Value(base_days, IntegerField()))
+        calculator_cls = import_string(settings.POPULARITY_CALCULATOR)
+        calculator = calculator_cls(base_days)
+        return calculator.annotate_score(qs, 'score')
 
     
