@@ -63,7 +63,7 @@ class CrawlAction(Action):
     def build_payload(self, obj):
         kw_list = [obj.mid, obj.standard.mid, obj.standard2.mid]
         end = now().strftime('%Y-%m-%d')
-        start = (now() - timedelta(days=180)).strftime('%Y-%m-%d')
+        start = (now() - timedelta(days=1080)).strftime('%Y-%m-%d')
         timeframe = '%s %s' % (start, end)
 
         pytrends.build_payload(kw_list, cat=0, timeframe=timeframe, geo=obj.geo, gprop='')

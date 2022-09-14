@@ -42,6 +42,8 @@ class BaseDaysFilter(SimpleListFilter):
             (30, 30),
             (90, 90),
             (180, 180),
+            (360, '1Y'),
+            (1080, '3Y')
         ]
 
     def choices(self, changelist):
