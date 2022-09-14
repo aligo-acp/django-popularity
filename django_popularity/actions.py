@@ -47,7 +47,7 @@ class CrawlAction(Action):
             obj.standard2.graph,
             [{'date': r['date'], 'value': r[obj.standard2.mid]} for r in data]
         )
-        obj.save()
+        obj.update_score()
 
     def update_graph(self, graph, data: list):
         from django_popularity.models import DateGraphPoint

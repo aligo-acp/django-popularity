@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django_popularity.admin import (BaseDaysFilter, GeoFilter,
-                                     RegisterMIDAdmin, register_proxy_model)
+from django_popularity.admin import (GeoFilter, RegisterMIDAdmin,
+                                     register_proxy_model)
 
 from . import models
 
@@ -13,18 +13,17 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'geo',
-        'popularity',
+        'popularity1080',
     )
     list_filter = (
         GeoFilter,
-        BaseDaysFilter,
     )
 
     def geo(self, obj):
         return obj.geo
 
-    def popularity(self, obj):
-        return obj.popularity
+    def popularity1080(self, obj):
+        return obj.score1080
 
     def get_list_display(self, request):
         return super().get_list_display(request)
@@ -33,8 +32,6 @@ class PersonAdmin(admin.ModelAdmin):
         kwargs = {}
         if geo := request.GET.get('geo'):
             kwargs['geo'] = geo
-        if base_days := request.GET.get('base_days'):
-            kwargs['base_days'] = int(base_days)
         return self.model.objects_with_popularity(**kwargs)
 
 

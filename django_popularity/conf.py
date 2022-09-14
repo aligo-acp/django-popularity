@@ -6,7 +6,6 @@ from pytrends.request import TrendReq
 
 
 class DjangoPopularityAppConf(AppConf):
-    DEFAULT_BASE_DAYS = 1080
     DEFAULT_GEO = 'KR'
     PYTRENDS = TrendReq(hl='en-EU')
     PROXIES = []

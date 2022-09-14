@@ -1,9 +1,10 @@
 from django.db import models
+from django.utils.module_loading import import_string
 from django_action_reservation.reservation import Reservation
 
 from django_popularity.actions import CrawlAction
+from django_popularity.conf import settings
 from django_popularity.fields import MIDField
-from django_popularity.managers import PopularityManager
 
 
 class PopularityBase(models.Model):
@@ -13,17 +14,31 @@ class PopularityBase(models.Model):
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
     geo = models.CharField(max_length=255)
+    score30 = models.FloatField(default=0)
+    score90 = models.FloatField(default=0)
+    score180 = models.FloatField(default=0)
+    score360 = models.FloatField(default=0)
+    score1080 = models.FloatField(default=0)
 
     class Meta:
         abstract = True
+
+    def update_score(self):
+        calculator = import_string(settings.POPULARITY_CALCULATOR)
+        self.score1080 = calculator(1080).calculate(self)
+        self.score360 = calculator(360).calculate(self)
+        self.score180 = calculator(180).calculate(self)
+        self.score90 = calculator(90).calculate(self)
+        self.score30 = calculator(30).calculate(self)
+        self.save()
 
 
 class Popularity(PopularityBase):
     standard = models.OneToOneField('django_popularity.Standard', models.DO_NOTHING, related_name='popularity1')
     standard2 = models.OneToOneField('django_popularity.Standard', models.DO_NOTHING, related_name='popularity2')
     graph = models.OneToOneField('django_popularity.Graph', models.DO_NOTHING, related_name='popularity')
-    
-    objects = PopularityManager()
+
+    objects = models.Manager()
     action_reservation = Reservation([CrawlAction])
 
     @staticmethod

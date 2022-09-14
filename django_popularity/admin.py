@@ -32,29 +32,6 @@ class GeoFilter(SimpleListFilter):
         return queryset
 
 
-class BaseDaysFilter(SimpleListFilter):
-    title = 'base date'
-    parameter_name = 'base_days'
-
-    def lookups(self, request, model_admin):
-        return [
-            (7, 7),
-            (30, 30),
-            (90, 90),
-            (180, 180),
-            (360, '1Y'),
-            (1080, '3Y')
-        ]
-
-    def choices(self, changelist):
-        choices = list(super().choices(changelist))
-        choices[0]['display'] = 'default(%d)' % settings.POPULARITY_DEFAULT_BASE_DAYS
-        return choices
-
-    def queryset(self, request, queryset):
-        return queryset
-
-
 def create_proxy_model(model, name):
     class Meta:
         proxy = True
@@ -111,7 +88,18 @@ class RegisterMIDAdmin(admin.ModelAdmin):
             if not Popularity.objects.filter(mid=obj.mid).exists():
                 Popularity.init_all_geo(suggestion)
         obj.save()
-    
+
+
+@admin.action(description='calculate scores')
+def calculate_scores(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.update_score()
+
+
+@admin.action(description='reserve crawl')
+def reserve_crawl(modeladmin, request, queryset):
+    queryset.reserve('crawl')
+
 
 @admin.register(Popularity)
 class PopularitAdmin(admin.ModelAdmin):
@@ -134,16 +122,21 @@ class PopularitAdmin(admin.ModelAdmin):
         'updated',
         'geo',
         'updated',
-        'score',
-        'base_days',
+        'score1080',
+        'score360',
+        'score180',
+        'score90',
     )
     list_filter = (
         'geo',
-        BaseDaysFilter,
     )
     inlines = (
         create_reservation_inline(Popularity, extra=1),
     )
+    actions = [calculate_scores, reserve_crawl]
+
+    def get_queryset(self, request):
+        return self.model.objects_for_reserve.all()
 
     @property
     def media(self):
@@ -155,22 +148,6 @@ class PopularitAdmin(admin.ModelAdmin):
         return mark_safe(
             f'<canvas data-request_url="{request_url}" height="200" id="visualization"></canvas>'
         )
-
-    @admin.display(ordering='score')
-    def score(self, obj):
-        if not obj.score:
-            return None
-        return '%.2f' % obj.score
-
-    @admin.display()
-    def base_days(self, obj):
-        return obj.base_days
-
-    def get_queryset(self, request):
-        kwargs = {}
-        if base_days := request.GET.get('base_days'):
-            kwargs['base_days'] = int(base_days)
-        return self.model.objects.get_queryset(**kwargs)
 
 
 @admin.register(GeoStandard)
