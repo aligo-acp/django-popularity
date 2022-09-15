@@ -58,6 +58,8 @@ class Popularity(PopularityBase):
 
     @staticmethod
     def init_geo_by_mid(mid, geo):
+        if Popularity.objects.filter(mid=mid, geo=geo).exists():
+            return
         obj = Popularity.objects.filter(mid=mid).first()
         obj.pk = None
         obj.graph = Graph.objects.create()
@@ -113,6 +115,7 @@ class GeoStandard(models.Model):
     geo = models.CharField(
         max_length=100,
         unique=True,
+        blank=True,
         choices=(
             ('US', 'US'),
             ('JP', 'JP'),
@@ -123,6 +126,7 @@ class GeoStandard(models.Model):
             ('SG', 'SG'),
             ('IT', 'IT'),
             ('KR', 'KR'),
+            ('', 'World wide'),
         )
     )
     top_mid = MIDField(max_length=100)
