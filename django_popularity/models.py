@@ -148,3 +148,27 @@ class SuggestionResult(models.Model):
             SuggestionResult.objects.update_or_create(
                 {'mid': row['mid']}, title=row['title'], type=row['type']
             )
+
+
+class ProxyPopularity(models.Model):
+    created = models.DateTimeField()
+    updated = models.DateTimeField()
+    title = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+    geo = models.CharField(max_length=255)
+    graph = models.OneToOneField('django_popularity.Graph', models.DO_NOTHING, related_name='ignore')
+    standard = models.OneToOneField('django_popularity.Standard', models.DO_NOTHING, related_name='ignore')
+    standard2 = models.OneToOneField('django_popularity.Standard', models.DO_NOTHING, related_name='ignore2')
+    score1080 = models.FloatField()
+    score180 = models.FloatField()
+    score30 = models.FloatField()
+    score360 = models.FloatField()
+    score90 = models.FloatField()
+
+    class Meta:
+        abstract = True
+
+
+class ProxyPopularityMeta:
+    managed = False
+    db_table = 'django_popularity_popularity'

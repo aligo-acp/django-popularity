@@ -29,4 +29,10 @@ def objects_with_mid_info(cls):
     return cls.objects \
               .annotate(type=Subquery(sugs.values('type'))) \
               .annotate(title=Subquery(sugs.values('title')))
-    
+
+
+@property
+def popularities(self):
+    from django_popularity.models import Popularity
+
+    return Popularity.objects.filter(mid=self.mid)
