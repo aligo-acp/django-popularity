@@ -26,7 +26,7 @@ class Popularity:
         bases = (ProxyPopularity, )
         attrs = {
             'mid': models.ForeignKey(
-                'demo_app.Person',
+                cls._meta.app_label + '.' + cls.__name__,
                 models.CASCADE,
                 to_field='mid',
                 related_name='popularities',
