@@ -66,6 +66,8 @@ class CrawlAction(Action):
         start = (now() - timedelta(days=1080)).strftime('%Y-%m-%d')
         timeframe = '%s %s' % (start, end)
 
+        # reset geo for world wide        
+        pytrends.geo = ''
         pytrends.build_payload(kw_list, cat=0, timeframe=timeframe, geo=obj.geo, gprop='')
 
 
