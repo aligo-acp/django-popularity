@@ -136,7 +136,7 @@ class PopularitAdmin(admin.ModelAdmin):
     actions = [calculate_scores, reserve_crawl]
 
     def get_queryset(self, request):
-        return self.model.objects_for_reserve.all()
+        return self.model.objects.all()
 
     @property
     def media(self):
@@ -158,11 +158,16 @@ class GeoStandardAdmin(admin.ModelAdmin):
         'top_mid',
         'bot_title',
         'bot_mid',
+        'is_active',
     )
     list_display = (
         'geo',
         'top_title',
         'bot_title',
+        'is_active',
+    )
+    list_editable = (
+        'is_active',
     )
 
     def get_readonly_fields(self, request, obj=None):
@@ -194,7 +199,7 @@ class GeoStandardAdmin(admin.ModelAdmin):
                 Standard.objects.filter(geo=prev_obj.geo, is_top=False).update(
                     title=obj.bot_title, mid=obj.bot_mid, type=obj.bot_type
                 )
-                Popularity.objects_for_reserve.filter(geo=obj.geo).reserve('crawl')
+                Popularity.objects.filter(geo=obj.geo).reserve('crawl')
             obj.save()
 
 

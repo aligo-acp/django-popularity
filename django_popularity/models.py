@@ -5,6 +5,7 @@ from django_action_reservation.reservation import Reservation
 from django_popularity.actions import CrawlAction
 from django_popularity.conf import settings
 from django_popularity.fields import MIDField
+from django_popularity.managers import PopularityManager
 
 
 class PopularityBase(models.Model):
@@ -38,7 +39,7 @@ class Popularity(PopularityBase):
     standard2 = models.OneToOneField('django_popularity.Standard', models.DO_NOTHING, related_name='popularity2')
     graph = models.OneToOneField('django_popularity.Graph', models.DO_NOTHING, related_name='popularity')
 
-    objects = models.Manager()
+    objects = PopularityManager()
     action_reservation = Reservation([CrawlAction])
 
     @staticmethod
@@ -112,22 +113,35 @@ class DateGraphPoint(models.Model):
 
 
 class GeoStandard(models.Model):
+    GEO_DICT = {
+        # code: display_name
+        'US': 'United States',
+        'JP': 'Japan',
+        'GB': 'United Kingdom',
+        'FR': 'France',
+        'DE': 'Germany',
+        'TH': 'Thaland',
+        'SG': 'Singapore',
+        'IT': 'Italy',
+        'KR': 'Korea',
+        'ES': 'Spain',
+        'IN': 'India',
+        'TR': 'Turkey',
+        'BR': 'Brazil',
+        'MX': 'Mexico',
+        'CA': 'Canada',
+        'AU': 'Australia',
+        '' : 'World wide',
+    }
+    GEO_CHOICES = [
+        (code, '%s (%s)' % (code, display_name))
+        for code, display_name in GEO_DICT.items()
+    ]
     geo = models.CharField(
         max_length=100,
         unique=True,
         blank=True,
-        choices=(
-            ('US', 'US'),
-            ('JP', 'JP'),
-            ('GB', 'GB'),
-            ('FR', 'FR'),
-            ('DE', 'DE'),
-            ('TH', 'TH'),
-            ('SG', 'SG'),
-            ('IT', 'IT'),
-            ('KR', 'KR'),
-            ('', 'World wide'),
-        )
+        choices=GEO_CHOICES
     )
     top_mid = MIDField(max_length=100)
     top_title = models.CharField(max_length=100)
@@ -135,6 +149,10 @@ class GeoStandard(models.Model):
     bot_mid = MIDField(max_length=100)
     bot_title = models.CharField(max_length=100)
     bot_type = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.GEO_DICT[self.geo]
 
 
 class SuggestionResult(models.Model):
@@ -164,6 +182,7 @@ class ProxyPopularity(models.Model):
     score30 = models.FloatField()
     score360 = models.FloatField()
     score90 = models.FloatField()
+    objects = PopularityManager()
 
     class Meta:
         abstract = True

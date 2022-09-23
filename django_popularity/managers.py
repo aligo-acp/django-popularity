@@ -1,4 +1,5 @@
-from django.db.models import CharField, OuterRef, Subquery, Value
+from django.db.models import CharField, Manager, OuterRef, Subquery, Value
+from django_action_reservation.managers import TargetQuerySet
 
 from django_popularity.conf import settings
 
@@ -36,3 +37,11 @@ def popularities(self):
     from django_popularity.models import Popularity
 
     return Popularity.objects.filter(mid=self.mid)
+
+
+class PopularityManager(Manager.from_queryset(TargetQuerySet)):
+    def get_queryset(self):
+        from django_popularity.models import GeoStandard
+
+        active_geo_list = GeoStandard.objects.filter(is_active=True).values('geo')
+        return super().get_queryset().filter(geo__in=active_geo_list)

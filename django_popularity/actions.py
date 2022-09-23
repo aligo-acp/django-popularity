@@ -18,6 +18,10 @@ class CrawlAction(Action):
     check_interval = settings.POPULARITY_RESERVATION_CHECK_INTERVAL
 
     def execute(self, obj):
+        from django_popularity.models import GeoStandard
+
+        if not GeoStandard.objects.get(geo=obj.geo).is_active:
+            raise Exception('Inactive geo')
         crawl_data = self.crawl(obj)
         self.update(obj, crawl_data)
         self.reserve(obj, now() + settings.POPULARITY_CRAWL_INTERVAL)
