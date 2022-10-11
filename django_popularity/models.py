@@ -187,6 +187,10 @@ class ProxyPopularity(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def get_display_geo(self):
+        return GeoStandard.GEO_DICT[self.geo]
+
 
 class ProxyPopularityMeta:
     managed = False
