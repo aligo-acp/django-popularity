@@ -9,6 +9,6 @@ setup(
         'djangorestframework>=3.0',
         'django-appconf>=1.0.0',
         'pytrends>=4.8.0',
-        'django_action_reservation @ git+https://github.com/aligo-acp/django-action-reservation.git#egg=django_action_reservation',
+        'django_action_reservation @ git+https://github.com/aligo-ai/django-action-reservation.git#egg=django_action_reservation',
     ]
 )
